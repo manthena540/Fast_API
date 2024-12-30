@@ -1,0 +1,992 @@
+FAST API's
+=============
+=============
+A super fast python web framework
+
+Features
+========
+========
+
+1.Automatic docs---->Swagger UI
+2.Based on open standard
+   json schema
+   open api
+
+3.security and authenciation
+   HTTP Basic
+   OAuth2(also with JWT tokens)
+   API KEYS'S---Header and query parameters
+4.Starlette Features
+    WebScoket support
+    GraphQL support
+    In-process backround tasks.
+    startup and stutdown events.
+
+5.Other supports
+
+   SQL databases
+   NoSql databases
+   GraphQL
+
+
+Let' START THE FAST API 
+________________________
+________________________
+
+Install and SetUp
+Break it down,how it structued
+
+1.
+path parameters
+API Docs-swagger/redocs
+Query Parameter
+Request Body
+
+2.
+Debugging FastApi
+pydantic schemas
+sqlAlchemy database connection
+Modelsand table
+
+3.DataBase Tasks
+store blog to database
+get blogs from database
+Delete
+Update
+
+4.Response
+Handling Exception
+Return Response
+Define Response Model
+
+5.user and password
+Create User
+Hash User Password
+Show single User
+Define Docs tags
+
+6.Realtionship
+Define User to Blog realtionship
+Define blog to user realtionship
+
+7.Refactor for bigger Appication
+API ROUTER
+API ROUTER WITH PARAMETER
+
+
+8.Authentication using JWT
+Create Login route
+Login and verify password
+Return JWT acess token
+Routes behind authentication
+
+9.DEPLOY FASTAPI's
+      using Deta.sh website to deploy
+
+
+======================================================================================
+======================================================================================
+python -m venv fastapi-env
+
+
+fastapi-env\Scripts\activate.bat
+
+
+pip install fastapi
+
+
+pip install uvicorn
+
+
+
+====================================================
+====================================================
+This is my first program in fastapi
+
+
+from fastapi import FastAPI---->Import 
+
+
+app = FastAPI()---------------->Instance
+@app.get('/')------------------>decorate
+def index():
+    return 'this is first program'---->function
+
+
+
+    run command ===
+
+
+ROUUTING
+=============================
+=============================
+
+2.This is my second program about routing
+
+@app.get('/about')
+def about():
+    return {'data':{'about page'}}
+
+
+
+output:
+path:http://127.0.0.1:8000/about
+{
+    "data": [
+        "about page"
+    ]
+}
+
+
+
+PATH PARAMETER
+===============================
+==============================
+@def.get('/about/{id})
+def show(id):
+   return {"data":id}
+
+
+
+@app.get('/blog/{id}/comments')
+def comments(id):
+    #fetch comments of blog with id =id
+    return {'data':{'1','2'}}
+
+
+
+API Docs-Swagger/Redocs
+
+
+localhost:8000/docs  ---swagger UI
+          OR
+localhost:8000/redoc ---REDOC UI
+
+
+
+
+QUERY PARAMETER
+===========================================
+===========================================
+
+Query Parameter and Path parameter are diffirence there is some confusion in it
+
+
+Query Parameter ====>http://localhost:8000/blog?limit=50
+Path Parameter  ====>http://localhost:8000/blog/100\
+
+query paraameter :
+
+
+@app.get('/blog')
+def index(limit):
+    # only 10 published blogs
+    return {'Data':f'{limit}blog list from the database'}
+
+
+
+
+http://localhost:8000/blog?limit=50&&published=true
+
+@app.get('/blog')
+def index(limit,published:bool):
+    # only 10 published blog
+    if published:
+        return {'Data':f'{limit} publisshed blog list from the database'}
+
+    else:
+        return{'data':f'{limit} unpublished'}
+
+
+
+http://localhost:8000/blog?sort=latest
+
+use 
+from typing import Optional
+
+
+@app.get('/blog')
+def index(limit=10,published:bool=True,sort:Optional[str]=None):
+    # only 10 published blog
+    if published:
+        return {'Data':f'{limit} publisshed blog list from the database'}
+
+    else:
+        return{'data':f'{limit} unpublished'}
+
+
+
+NOTE:IF ANYTHING IN @APP.GET(=======) THAT IN FUNCTION FAST API CONSIDERED AS A PATH
+OTHERWISE IT CONSIDERED S A QUERT PAARAMETER
+
+
+
+REQUEST Body
+==============================
+==============================
+use 
+pydantic
+
+
+from pydantic import BaseModel
+
+
+class Blog(BaseModel):
+    title: str
+    body: str
+    published_at: Optional[bool]
+
+
+
+@app.post('/blog')
+def create_blog(request: Blog):
+    return {'data':f"Blog i created with title as {request.title}"}
+
+
+
+HOW TO DEBUG
+=======================
+=======================
+=======================
+
+
+use Breakpoint 
+and clt+shift+p ===for Debugging
+
+
+
+import uvicorn
+
+
+
+if __name__=="__main__":
+    uvicorn.run(app,host="127.0.0.1",port=9000)
+
+
+
+
+pydantic schemas
+=========================================
+=========================================
+=========================================
+
+
+
+.\fastapi-env\Scripts\activate 
+pip install -r requirements.txt
+
+uvicorn main:app --reload  
+
+
+THis example of websocket 
+__________________________
+__________________________
+
+from fastapi import FastAPI, WebSocket
+import json
+
+app = FastAPI()
+
+# Sample user data
+table_data = [
+    {"id": 1, "name": "Alice", "email": "alice@example.com", "age": 25},
+    {"id": 2, "name": "Bob", "email": "bob@example.com", "age": 30},
+    {"id": 3, "name": "Charlie", "email": "charlie@example.com", "age": 35}
+]
+
+pichat_data={
+  "title": {
+    "text": "Referer of a Website",
+    "subtext": "Fake Data",
+    "left": "center"
+  },
+  "tooltip": {
+    "trigger": "item"
+  },
+  "legend": {
+    "orient": "vertical",
+    "left": "left"
+  },
+  "series": [
+    {
+      "name": "Access From",
+      "type": "pie",
+      "radius": "50%",
+      "data": [
+        { "value": 1048, "name": "Search Engine" },
+        { "value": 735, "name": "Direct" },
+        { "value": 580, "name": "Email" },
+        { "value": 484, "name": "Union Ads" },
+        { "value": 300, "name": "Video Ads" }
+      ],
+      "emphasis": {
+        "itemStyle": {
+          "shadowBlur": 10,
+          "shadowOffsetX": 0,
+          "shadowColor": "rgba(0, 0, 0, 0.5)"
+        }
+      }
+    }
+  ]
+}
+
+scatter_data={
+  "xAxis": {},
+  "yAxis": {},
+  "series": [
+    {
+      "symbolSize": 20,
+      "data": [
+        [10.0, 8.04],
+        [8.07, 6.95],
+        [13.0, 7.58],
+        [9.05, 8.81],
+        [11.0, 8.33],
+        [14.0, 7.66],
+        [13.4, 6.81],
+        [10.0, 6.33],
+        [14.0, 8.96],
+        [12.5, 6.82],
+        [9.15, 7.2],
+        [11.5, 7.2],
+        [3.03, 4.23],
+        [12.2, 7.83],
+        [2.02, 4.47],
+        [1.05, 3.33],
+        [4.05, 4.96],
+        [6.03, 7.24],
+        [12.0, 6.26],
+        [12.0, 8.84],
+        [7.08, 5.82],
+        [5.02, 5.68]
+      ],
+      "type": "scatter"
+    }
+  ]
+}
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()  # Accept WebSocket connection
+    await websocket.send_text("Welcome to the WebSocket connection!")
+    
+    while True:
+        try:
+            # Wait for message from the client
+            data = await websocket.receive_text()
+            
+            # Handle specific requests
+            if data.strip().lower() == "table":
+                # Send user data as JSON string
+                await websocket.send_text(json.dumps(table_data))
+            if data.strip().lower() =="piechart":
+                await websocket.send_text(json.dumps(pichat_data))
+            if data.strip().lower() =="scatter":
+                await websocket.send_text(json.dumps(scatter_data))
+            else:
+                # Echo the message back to the client
+                await websocket.send_text(f"Message received: this is {data}")
+        except Exception as e:
+            print(f"Error: {e}")
+            break
+    
+    await websocket.close()
+
+
+__________________________________________________________________________________________________________
+
+
+AFTER YOU CREATE A BLOG FOLDER AND THEN AND SOME FILES
+python -m venv blog-env
+
+
+
+
+This is simple post api
+
+from  fastapi import FastAPI
+
+app = FastAPI()
+
+@app.post('/blog')
+def create():
+    return 'creating'
+
+
+SOMEMORE BEAUTIFUL MODEL IS TO
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.post('.blog)
+def crete(title,body):
+    return {'title':title,'body':body}
+    
+
+
+
+using pydantic beatiful interface 
+
+from  fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Blog(BaseModel):
+    title: str
+    body: str
+
+@app.post('/blog')
+def create(request:Blog):
+    return request
+
+
+Create schemas.py for initial step to connect database
+_______________________________________________
+schemas.py
+
+from pydantic import BaseModel
+
+class Blog(BaseModel):
+    title:str
+    body:str
+
+_______________________________________________
+
+main.py
+
+from fastapi import FastAPI
+from . import schemas
+
+@app.post('/blog):
+def create(request:schemas.Blog)
+   return request
+
+_______________________________________________
+
+
+DATABASE CONNECTION FOR FASTAPI
+==============================================
+==============================================
+
+FASTapi need  sqlAlchemy
+
+object realtional mapping 
+
+it is nothing but for example if you create a pet class it is represent a sql table parameters
+
+establish connection of sqlite
+database.py
+==========================
+=========================
+=========================
+
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+
+
+sql_alchemy_database_url = "sqlite:///./blog.db"
+
+engine =create_engine(sql_alchemy_database_url,connect_args={"check_same_thread":False})
+
+
+sessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
+
+Base = declarative_base()
+
+schemas.py
+=======================
+=======================
+======================
+from pydantic import BaseModel
+
+class Blog(BaseModel):
+    title:str
+    body:str
+
+
+models.py
+====================================
+===================================
+===================================
+from sqlalchemy import Column, Integer, String, Text, DateTime
+from .database import Base
+
+class Blog(Base):
+    __tablename__ = "blogs"
+
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String)
+    body = Column(Text)
+  
+main.py
+
+=============================
+============================
+
+from fastapi import FastAPI
+from . import schemas,models
+from .database import engine
+
+app = FastAPI()
+
+models.Base.metadata.create_all(bind=engine) 
+@app.post("/blog")
+def create_blog(request:schemas.Blog):
+    return {"title":request.title,"body":request.body}
+
+
+
+
+
+Recap:
+
+
+__________________________________________________________________________________________________________
+create a folder in folder name blog
+
+1.In blog folder create database.py file ===create path define engine and session local and Base\
+2.create model.py define every file inside the table 
+3.in main.py import all the file and define model  every time happing likle this 
+
+
+STORE BLOG INFORMATION IN DATABASE
+=================================
+=================================
+=================================
+first import this
+from sqlalchemy import Session
+
+import depends also in fastapi
+from fastapi import FastAPI,Depends
+
+
+import sessionLocal also
+
+from .database import engine, sessionLocal
+
+
+then the code is :::
+
+def get_db():
+    db = sessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+models.Base.metadata.create_all(bind=engine) 
+@app.post("/blog")
+def create_blog(request:schemas.Blog,db:Session = Depends(get_db)):
+    new_blog = models.Blog(title=request.title,body=request.body)
+    db.add(new_blog)
+    db.commit()
+    db.refresh(new_blog)
+    return new_blog
+
+CREATE A BLOG IS COMPLETE THEN NOW ACCESS THE ALL BLOG FROM THE DATABASE
+IT WAS INTERSTIONG HOW I GET ALL BLOGS FROM THE DATABASE
+
+
+@app.get("/blog")
+def all_blog(db:Session = Depends(get_db)):
+    blogs = db.query(models.Blog).all()
+    return blogs
+
+@app.get("/blog/{id}")
+def single_blog(id,db:Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    return blog
+
+EXCEPTION AND STATUS code
+========================
+========================
+========================
+
+200 = ok
+201 = created
+
+
+import status then it automatically predicte
+
+from fastapi import FastAPI,Depends,status
+
+in decorater define like this @app.post("/blog",status_code=status.HTTP_201_CREATED)
+ok it will give
+
+but when there our query is out of the box then how will i manage 
+import response 
+from fastapi import FastAPI,Depends,status ,Response
+
+
+the code is:
+
+@app.get("/blog/{id}",status_code=200)
+def single_blog(id,response:Response,db:Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    if not blog:
+        response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail":f"Blog with id {id} not found"}
+    return blog  
+
+
+instead of this two things use single line
+  response.status_code = status.HTTP_404_NOT_FOUND
+        return {"detail":f"Blog with id {id} not found"}
+
+        ====================
+
+IMPORT HTTPEXCEPTION IN FASTAPI
+
+from fastapi import FastAPI,Depends,status ,Response,HTTPException
+
+@app.get("/blog/{id}",status_code=200)
+def single_blog(id,response:Response,db:Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id).first()
+    if not blog:
+        HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Blog with id {id} not found")
+       #response.status_code = status.HTTP_404_NOT_FOUND
+       #return {"detail":f"Blog with id {id} not found"}
+    return blog
+
+
+Delete a Blog
+=======================
+=======================
+=====================
+
+@app.delete("/blog/{id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_blog(id,response:Response,db:Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id)
+    if not blog.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Blog with id {id} not found")
+    blog.delete(synchronize_session=False)
+    db.commit()
+    return "done"
+
+
+UPDATE A BLOG
+====================
+====================
+====================
+
+@app.put("/blog/{id",status_code=status.HTTP_202_ACCEPTED)
+def update_blog(id,request:schemas.Blog,db:Session = Depends(get_db)):
+    blog = db.query(models.Blog).filter(models.Blog.id == id)
+    if not blog.first():
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Blog with id {id} not found")
+    blog.update({"title":request.title,"body":request.body})
+    db.commit()
+    return "updated"
+
+
+
+RESPONSE MODEL
+======================
+======================
+======================
+
+in schemas.py 
+
+from pydantic import BaseModel
+
+class Blog(BaseModel):
+    title:str
+    body:str
+    
+class ShowBlog(BaseModel):
+    title : str
+    class Config():
+        orm_mode = True
+
+        and in api 
+        main.py
+@app.get("/blog/{id}",status_code=200,response_model=schemas.ShowBlog)
+
+
+in get the output is more than one then we import typing
+from typing import List
+
+
+
+@app.get("/blog",response_model=List[schemas.ShowBlog])
+def all_blog(db:Session = Depends(get_db)):
+    blogs = db.query(models.Blog).all()
+    return blogs
+
+if you want body also:::
+from pydantic import BaseModel
+
+class Blog(BaseModel):
+    title:str
+    body:str
+    
+class ShowBlog(BaseModel):
+    title : str
+    body : str
+    class Config():
+        orm_mode = True
+
+
+CREATE User
+=================
+================
+===============
+in main.py crere user api
+in schemas.py define which term on it 
+in model define table
+
+in main.py
+@app.post("/user")
+def create_user(request:schemas.User,db:Session = Depends(get_db)):
+    new_user = models.User(name=request.name,email=request.email,password=request.password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+im model.py
+class User(Base):
+    __tablename__='user'
+    id = Column(Integer, primary_key=True, index = True)
+    name = Column(String)
+    email = Column(String)
+    password = Column(String)
+  
+
+in schema.py
+
+class User(BaseModel):
+    name : str
+    email : str
+    password : str
+    
+
+HASH THE PASSWORD
+================
+================
+================
+===============
+
+install passlib and bcrypt
+
+in main.py import
+
+from passlib.context import CryptContext
+
+
+and assign it 
+pwd_cxt = CryptContext(schemes=["bcrypt"],deprecated="auto")
+
+in api update this line 
+
+    hassed_password = pwd_cxt.hash(request.password)
+
+password will succesfull decrypted
+
+from passlib.context import CryptContext
+
+pwd_cxt = CryptContext(schemes=["bcrypt"],deprecated="auto")
+
+@app.post("/user")
+def create_user(request:schemas.User,db:Session = Depends(get_db)):
+    hassed_password = pwd_cxt.hash(request.password)
+    new_user = models.User(name=request.name,email=request.email,password=hassed_password)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
+
+
+SHOW A User
+===============
+===============
+===============
+@app.get("/user/{id}",response_model=schemas.ShowUser)
+def get_user(id:int,db:Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"User with id {id} not found")
+    return user
+
+USING DOCS TAGS
+===================
+==================
+==================
+
+define like this 
+
+tags=["users"]
+
+@app.get("/blog/{id}",status_code=200,response_model=schemas.ShowBlog,tags=["blogs"])
+
+@app.post("/user",response_model=schemas.ShowUser,tags=["users"])
+
+
+
+
+_________________________________________________________________________
+Realtionship
+________________________________________________________________________
+
+
+in model.py 
+import this 
+from sqlalchemy.orm import relationship
+
+pratice some times use forigen KEYS to combined two...
+
+
+API ROUTER
+=================
+==================
+==================
+
+when we create large application we have some many that why api routers
+
+create a router folder 
+in that routers folder create __init__.py file'
+blog.py file
+user.py file 
+
+in blog .py
+first step:
+from fastapi import APIRouter
+
+router = APIRouter()
+
+and then 
+write like this
+from typing import List
+from fastapi import APIRouter,Depends
+from .. import schemas,models,database
+from sqlalchemy.orm import Session
+
+router = APIRouter()
+
+@router.get("/blog",response_model=List[schemas.ShowBlog],tags=["blogs"])
+def all_blog(db:Session = Depends(database.get_db)):
+    blogs = db.query(models.Blog).all()
+    return blogs
+
+
+then you have register to main.py
+
+like this 
+app.include_router(blog.router)
+
+if want more than one
+
+then in main.py
+import like this
+from .routers import blog,user 
+
+app.include_router(blog.router)
+app.include_router(user.router)
+
+
+API ROUTER OPERATION
+==================
+====================
+=====================
+REMOVE COMMAN TERM FORM EVERYERY AND ADD IN 
+router = APIRouter( tags=["blogs"]  )
+
+and for prefix use like this and remove in all apis
+
+router = APIRouter( 
+                   prefix="/blog",
+                   
+                   tags=["blogs"]  )
+
+these two are our make clean and easy
+
+BLOG AND USER RESPOSITORIES
+===========================
+===========================
+===========================
+===========================
+
+to make code more clean
+create a repository folder and in that folder add blog.py
+and write 
+
+from sqlalchemy.orm import Session
+from .. import models
+def get_all(db:Session):
+    blogs = db.query(models.Blog).all()
+    return blogs
+
+in router/blog.py return the function 
+
+@router.get("/",response_model=List[schemas.ShowBlog])
+def all_blog(db:Session = Depends(get_db)):
+    return blog.get_all(db)
+
+
+
+LOGIN AND VERIFY PASSWORD
+========================
+=======================
+=======================
+
+create a file in router authenciation.py
+and the basic code is
+
+
+from fastapi import APIRouter
+
+router = APIRouter()
+
+@router.get("/login")
+def login():
+    return 'login '
+
+then register in main.py
+
+from .routers import blog,user,authentication
+
+app.include_router(authentication.router)
+app.include_router(user.router)
+app.include_router(blog.router)
+
+
+this is for authentication process :
+i hashing define function like this 
+def verify(hashed_password,plain_password):
+       return pwd_cxt.verify(plain_password,hashed_password)
+
+
+
+in authentication.py the api like this 
+@router.post("/login")
+def login(request:schemas.Login,db:Session = Depends(database.get_db)):
+    user = db.query(models.User).filter(models.User.email == request.username).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Invalid Credentials")
+    if not Hash.verify(user.password,request.password):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"Incorrect password")
+    return user
+
+
+JWT ACCESS TOKEN GENERATION
+==========================
+==========================
+=========================
+first install this 
+python-jose
+
+
+ROUTES BEHING Authentication
+===========================
+===========================
+===========================
+
+create Oauth2.py file in blog
+
+
+deploying using Deta.sh
